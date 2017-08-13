@@ -171,11 +171,10 @@ class SelectorCV(ModelSelector):
             return self.base_model(self.n_constant)
 
         max_score = float('-inf')
-
+        best_n = None
 
         for n in range(self.min_n_components, self.max_n_components+1):
             try:
-                #print("try with n = ", n)
                 model = GaussianHMM(n_components=n, covariance_type="diag", n_iter=1000,
                                     random_state=self.random_state, verbose=False)
                 scores = []
@@ -193,11 +192,13 @@ class SelectorCV(ModelSelector):
                 if max_score < cv_score:
                     max_score = cv_score
                     best_n = n
-                    #print("   best_n = ", best_n)
 
             except:
-                #print("   failed")
                 pass
+
+        if best_n == None:
+            #all fails
+            best_n = 3
 
         best_model = GaussianHMM(n_components=best_n, covariance_type="diag", n_iter=1000,
                     random_state=self.random_state, verbose=False)
